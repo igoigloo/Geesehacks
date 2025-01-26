@@ -21,9 +21,7 @@ const Map = ({ data, data2 }) => {
   const [cameras, setCameras] = useState([]);
 
   useEffect(() => {
-    if (data2 && data2.length > 0) {
-      setAccidentData(data2);
-    }
+    setAccidentData(data2);
   }, [data2]);
 
   useEffect(() => {
@@ -32,18 +30,20 @@ const Map = ({ data, data2 }) => {
     }
   }, [data]);
 
-  useEffect(() => {
-    const changeMarkerColor = (newColor) => {
-      accidentData.forEach((accident) => {
-        const Id = accident.id;
-        const marker = markersRef.current[Id];
-        if (marker) {
-          const markerElement = marker.getElement();
-          markerElement.style.backgroundColor = newColor;
-        }
-      });
-    };
+  const changeMarkerColor = (newColor) => {
+    accidentData.forEach((accident) => {
+      const Id = accident.id;
+      const marker = markersRef.current[Id];
+      if (marker) {
+        const markerElement = marker.getElement();
+        markerElement.style.backgroundColor = newColor;
+        markerElement.style.width = "28px";
+        markerElement.style.height = "28px";
+      }
+    });
+  };
 
+  useEffect(() => {
     changeMarkerColor("red");
   }, [accidentData]);
 
@@ -63,11 +63,14 @@ const Map = ({ data, data2 }) => {
       cameras.forEach((camera) => {
         // Create a custom HTML element for the marker
         const markerElement = document.createElement("div");
-        markerElement.style.backgroundColor = "green";
-        markerElement.style.width = "20px";
-        markerElement.style.height = "20px";
-        markerElement.style.borderRadius = "50%";
-        markerElement.style.border = "2px solid white";
+        Object.assign(markerElement.style, {
+          backgroundColor: "green",
+          width: "22px",
+          height: "22px",
+          borderRadius: "50%",
+          border: "1px solid white",
+          cursor: "pointer",
+        });
 
         const popup = new mapboxgl.Popup({ offset: 25 }).setText(
           camera.description

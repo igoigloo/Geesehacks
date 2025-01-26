@@ -44,11 +44,15 @@ function App() {
   }, [items]);
 
   const createAccident = () => {
+    if (accidentData.length > 0) {
+      setAccidentData((accidentData) => []);
+      return;
+    }
     const data = {
       id: 832,
-      lat: -79,
-      lng: -79,
-      description: "Brampton Highway 401",
+      lat: -79.3471,
+      lng: 43.3273,
+      description: "Lake Shore Boulevard near Lower Simcoe Street",
       accident: true,
     };
     setAccidentData((accidentData) => [...accidentData, data]);
@@ -58,7 +62,29 @@ function App() {
     <div style={{ display: "flex" }}>
       <SidebarComponent data={accidentData} />
       <MapComponent data={cameras} data2={accidentData} />
-      <button onClick={createAccident}>Create an accident</button>
+      <button
+        onClick={createAccident}
+        style={{
+          height: "50px",
+          backgroundColor: "black",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          fontSize: "13px",
+          fontWeight: "bold",
+          cursor: "pointer",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          transition: "background-color 0.3s ease, transform 0.2s ease",
+        }}
+        onMouseOver={(e) => {
+          e.target.style.transform = "scale(1.05)";
+        }}
+        onMouseOut={(e) => {
+          e.target.style.transform = "scale(1)";
+        }}
+      >
+        Create an Accident
+      </button>
     </div>
   );
 }
