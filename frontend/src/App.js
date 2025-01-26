@@ -4,11 +4,20 @@ import React, { useState, useEffect } from "react";
 
 function App() {
   const [accidentData, setAccidentData] = useState([]);
+  const [refreshCount, setRefreshCount] = useState(0); // State to trigger re-render
 
   const [cameras, setCameras] = useState([]);
 
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshCount((prevCount) => prevCount + 1); // Trigger a refresh
+    }, 10 * 60 * 1000); // 5 minutes in milliseconds
+
+    return () => clearInterval(interval); // Clear the interval on unmount
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -23,18 +32,37 @@ function App() {
 
   useEffect(() => {
     if (loaded) {
+      const loadData = async () => {
+        // Fetch data from the API
+        const response = await fetch(
+          "http://127.0.0.1:8000/toronto-cameras",
+          {}
+        );
+        const data = await response.json();
+        setItems(data);
+
+        setLoaded(true);
+      };
+
+      loadData();
+    }
+  }, [refreshCount]);
+
+  useEffect(() => {
+    if (loaded) {
       var list = [];
       items.forEach((camera) => {
         const newData = {
           id: camera?.Id,
           lng: camera?.Longitude,
           lat: camera?.Latitude,
-          description: `${camera?.Location} id: ${camera?.Id}`,
+          description: `${camera?.Location}`,
+          Accident: camera?.Accident,
         };
         list.push(newData);
       });
 
-      setCameras((cameras) => [...cameras, list]);
+      setCameras((cameras) => [list]);
       //setAccidentData((accidentData) => [...accidentData, newData]);
 
       //console.log(accidentData);
@@ -44,10 +72,42 @@ function App() {
   }, [items]);
 
   const createAccident = () => {
-    if (accidentData.length > 0) {
-      setAccidentData((accidentData) => []);
+    if (accidentData.length == 1) {
+      const data = {
+        id: 818,
+        lat: -79.3371,
+        lng: 42.3273,
+        description: "Lake Shore Boulevard near Sunnyside Beach",
+        accident: true,
+      };
+      setAccidentData((accidentData) => [...accidentData, data]);
       return;
     }
+
+    if (accidentData.length == 2) {
+      const data = {
+        id: 839,
+        lat: -78.3371,
+        lng: 44.3273,
+        description: "Don Valley Parkway near Eastern Avenue",
+        accident: true,
+      };
+      setAccidentData((accidentData) => [...accidentData, data]);
+      return;
+    }
+
+    if (accidentData.length == 3) {
+      const data = {
+        id: 813,
+        lat: -79.3371,
+        lng: 45.3473,
+        description: "Lake Shore Boulevard near Ontario Drive",
+        accident: true,
+      };
+      setAccidentData((accidentData) => [...accidentData, data]);
+      return;
+    }
+
     const data = {
       id: 832,
       lat: -79.3471,
