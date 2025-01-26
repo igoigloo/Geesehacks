@@ -11,3 +11,8 @@ The backend can be run locally or on a cloud server. The backend will consist of
 -geopy
 
 please refer to requirements.txt for more information.
+
+for backend:
+uvicorn main:app --reload
+
+
