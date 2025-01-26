@@ -3,20 +3,7 @@ import SidebarComponent from "./components/sidebareComponent";
 import React, { useState, useEffect } from "react";
 
 function App() {
-  const [accidentData, setAccidentData] = useState([
-    {
-      id: 100,
-      lng: -79.3832,
-      lat: 43.6532,
-      description: "Accident at Main St.",
-    },
-    {
-      id: 200,
-      lng: -79.3872,
-      lat: 43.6572,
-      description: "Collision near Dundas.",
-    },
-  ]);
+  const [accidentData, setAccidentData] = useState([]);
 
   const [cameras, setCameras] = useState([]);
 
@@ -42,7 +29,7 @@ function App() {
           id: camera?.Id,
           lng: camera?.Longitude,
           lat: camera?.Latitude,
-          description: camera?.Location,
+          description: `${camera?.Location} id: ${camera?.Id}`,
         };
         list.push(newData);
       });
@@ -55,21 +42,23 @@ function App() {
       //console.log(accidentData);
     }
   }, [items]);
-  const click = () => {
-    const newData = {
-      id: items[1]?.Id,
-      lng: -79.3832,
-      lat: 43.6562,
-      description: `Accident at ${items[1]?.Location}.`,
+
+  const createAccident = () => {
+    const data = {
+      id: 832,
+      lat: -79,
+      lng: -79,
+      description: "Brampton Highway 401",
+      accident: true,
     };
-    setCameras((cameras) => [...cameras, newData]);
+    setAccidentData((accidentData) => [...accidentData, data]);
   };
 
   return (
     <div style={{ display: "flex" }}>
-      <button onClick={click}>click</button>
       <SidebarComponent data={accidentData} />
-      <MapComponent data={cameras} />
+      <MapComponent data={cameras} data2={accidentData} />
+      <button onClick={createAccident}>Create an accident</button>
     </div>
   );
 }
