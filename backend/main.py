@@ -26,11 +26,58 @@ app.add_middleware(
 # Path to the SQLite database
 DATABASE_PATH = "data/cameras.db"
 
+FILTERED_DATABASE_PATH = "data/filtered_cameras.db"
+
+
 # Function to connect to the database
 def get_connection():
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row  # Allows column access by name
     return connection
+
+
+# Function to connect to the database
+def get_connection2():
+    connection2 = sqlite3.connect(FILTERED_DATABASE_PATH)
+    connection2.row_factory = sqlite3.Row  # Allows column access by name
+    return connection2
+
+# Route to get all toronto cameraas
+@app.get("/toronto-cameras/")
+def read_all_cameras():
+
+    connection2 = get_connection2()
+    cursor = connection2.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM Cameras")
+        cameras = cursor.fetchall()
+        return [dict(row) for row in cameras]  # Convert rows to dictionaries
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        connection2.close()
+
+
+# Route to get a camera by ID Tornro
+@app.get("/toronto-cameras/{camera_id}")
+def read_camera_by_id(camera_id: int):
+    connection2 = get_connection2()
+    cursor = connection2.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM Cameras WHERE Id = ?", (camera_id,))
+        camera = cursor.fetchone()
+        if camera is None:
+            raise HTTPException(status_code=404, detail="Camera not found")
+        return dict(camera)  # Convert row to dictionary
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        connection2.close()
+
+
+
 
 # Route to get all cameras
 @app.get("/cameras/")

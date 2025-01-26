@@ -4,6 +4,22 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 const Map = ({ data, data2 }) => {
   const [images, setImages] = useState([]);
+  // Add this to your CSS file or dynamically inject it into your JavaScript
+  const styleSheet = document.createElement("style");
+  styleSheet.type = "text/css";
+  styleSheet.innerText = `
+@keyframes radiate {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+`;
+  document.head.appendChild(styleSheet);
 
   useEffect(() => {
     // Fetch the list of images from the backend
@@ -52,6 +68,7 @@ const Map = ({ data, data2 }) => {
   useEffect(() => {
     if (data && data.length > 0) {
       setCameras(data[0]);
+      console.log(data);
     }
   }, [data]);
 
@@ -64,6 +81,23 @@ const Map = ({ data, data2 }) => {
         markerElement.style.backgroundColor = newColor;
         markerElement.style.width = "28px";
         markerElement.style.height = "28px";
+
+        const radiatingCircle = document.createElement("div");
+        Object.assign(radiatingCircle.style, {
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "28px",
+          height: "28px",
+          borderRadius: "50%",
+          backgroundColor: newColor,
+          opacity: 0.5,
+          animation: "radiate 1.5s infinite",
+        });
+
+        // Append the circle to the marker
+        markerElement.appendChild(radiatingCircle);
       }
     });
   };
@@ -74,6 +108,7 @@ const Map = ({ data, data2 }) => {
 
   useEffect(() => {
     if (cameras.length > 0 && images.length > 0) {
+      console.log("load");
       mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
@@ -86,16 +121,43 @@ const Map = ({ data, data2 }) => {
       markersRef.current = {};
 
       cameras.forEach((camera) => {
+        var colour = "";
+        var width = "22px";
+        var height = "22px";
+        var radiatingCircle;
+        if (camera.Accident == "TRUE") {
+          width = "28px";
+          height = "28px";
+          colour = "red";
+          radiatingCircle = document.createElement("div");
+          Object.assign(radiatingCircle.style, {
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "28px",
+            height: "28px",
+            borderRadius: "50%",
+            backgroundColor: colour,
+            opacity: 0.5,
+            animation: "radiate 1.5s infinite",
+          });
+        } else {
+          colour = "green";
+        }
         // Create a custom HTML element for the marker
         const markerElement = document.createElement("div");
         Object.assign(markerElement.style, {
-          backgroundColor: "green",
-          width: "22px",
-          height: "22px",
+          backgroundColor: colour,
+          width: width,
+          height: height,
           borderRadius: "50%",
           border: "1px solid white",
           cursor: "pointer",
         });
+        if (camera.Accident == "TRUE") {
+          markerElement.appendChild(radiatingCircle);
+        }
 
         const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
   <div style="text-align: center;">
