@@ -9,3 +9,5 @@ The backend can be run locally or on a cloud server. The backend will consist of
 -fastAPI
 -uvicorn
 -geopy
+
+please refer to requirements.txt for more information.

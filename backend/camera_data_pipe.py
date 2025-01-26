@@ -94,12 +94,12 @@ def save_to_database(cameras, db_name=r"backend\data\cameras.db"):
             INSERT OR IGNORE INTO Cameras (Id, Source, Roadway, Direction, Latitude, Longitude, Location)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (
-            camera.get('Id'),
+            camera.get('Id'), #*
             camera.get('Source'),
             camera.get('Roadway'),
             camera.get('Direction'),
-            camera.get('Latitude'),
-            camera.get('Longitude'),
+            camera.get('Latitude'), #*
+            camera.get('Longitude'), #*
             camera.get('Location')
         ))
 
