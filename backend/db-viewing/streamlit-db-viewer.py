@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 # Absolute path to the database
-DB_PATH = r"C:\Users\igodo\OneDrive\Desktop\Github-repos\Geesehacks\backend\data\cameras.db"
+DB_PATH = r"..\data\cameras.db"
 
 # Debugging: Print current working directory
 st.write(f"**Current Working Directory:** `{os.getcwd()}`")
