@@ -3,20 +3,7 @@ import SidebarComponent from "./components/sidebareComponent";
 import React, { useState, useEffect } from "react";
 
 function App() {
-  const [accidentData, setAccidentData] = useState([
-    {
-      id: 100,
-      lng: -79.3832,
-      lat: 43.6532,
-      description: "Accident at Main St.",
-    },
-    {
-      id: 200,
-      lng: -79.3872,
-      lat: 43.6572,
-      description: "Collision near Dundas.",
-    },
-  ]);
+  const [accidentData, setAccidentData] = useState([]);
 
   const [cameras, setCameras] = useState([]);
 
@@ -42,7 +29,7 @@ function App() {
           id: camera?.Id,
           lng: camera?.Longitude,
           lat: camera?.Latitude,
-          description: camera?.Location,
+          description: `${camera?.Location} id: ${camera?.Id}`,
         };
         list.push(newData);
       });
@@ -55,21 +42,49 @@ function App() {
       //console.log(accidentData);
     }
   }, [items]);
-  const click = () => {
-    const newData = {
-      id: items[1]?.Id,
-      lng: -79.3832,
-      lat: 43.6562,
-      description: `Accident at ${items[1]?.Location}.`,
+
+  const createAccident = () => {
+    if (accidentData.length > 0) {
+      setAccidentData((accidentData) => []);
+      return;
+    }
+    const data = {
+      id: 832,
+      lat: -79.3471,
+      lng: 43.3273,
+      description: "Lake Shore Boulevard near Lower Simcoe Street",
+      accident: true,
     };
-    setCameras((cameras) => [...cameras, newData]);
+    setAccidentData((accidentData) => [...accidentData, data]);
   };
 
   return (
     <div style={{ display: "flex" }}>
-      <button onClick={click}>click</button>
       <SidebarComponent data={accidentData} />
-      <MapComponent data={cameras} />
+      <MapComponent data={cameras} data2={accidentData} />
+      <button
+        onClick={createAccident}
+        style={{
+          height: "50px",
+          backgroundColor: "black",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          fontSize: "13px",
+          fontWeight: "bold",
+          cursor: "pointer",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          transition: "background-color 0.3s ease, transform 0.2s ease",
+        }}
+        onMouseOver={(e) => {
+          e.target.style.transform = "scale(1.05)";
+        }}
+        onMouseOut={(e) => {
+          e.target.style.transform = "scale(1)";
+        }}
+      >
+        Create an Accident
+      </button>
     </div>
   );
 }
