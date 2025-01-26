@@ -3,6 +3,31 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const Map = ({ data, data2 }) => {
+  const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    // Fetch the list of images from the backend
+    const fetchImages = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/image-list");
+        if (response.ok) {
+          const imageList = await response.json();
+          // Construct the full URLs for the images
+          const imageURLs = imageList.map(
+            (filename) => `http://127.0.0.1:8000/images/${filename}`
+          );
+          setImages(imageURLs);
+        } else {
+          console.error("Failed to fetch image list");
+        }
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    fetchImages();
+  }, []);
+
   const mapContainerRef = useRef(null);
   const markersRef = useRef({}); // Store markers by ID for dynamic updates
 
@@ -48,7 +73,7 @@ const Map = ({ data, data2 }) => {
   }, [accidentData]);
 
   useEffect(() => {
-    if (cameras.length > 0) {
+    if (cameras.length > 0 && images.length > 0) {
       mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
@@ -72,9 +97,20 @@ const Map = ({ data, data2 }) => {
           cursor: "pointer",
         });
 
-        const popup = new mapboxgl.Popup({ offset: 25 }).setText(
-          camera.description
-        );
+        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+  <div style="text-align: center;">
+    <img 
+src="${
+          images.find((url) => url.includes(`camera_${camera.id}.jpg`)) ||
+          "/path/to/placeholder.jpg"
+        }?t=${Date.now()}"
+      alt="Camera Image" 
+      style="width: 150px; height: auto; border-radius: 8px; margin-bottom: 8px;" 
+    />
+    <p>${camera.description || "No description available"}</p>
+    <p>Street id: ${camera.id}</p>
+  </div>
+`);
 
         // Create and add the marker to the map
         const marker = new mapboxgl.Marker(markerElement)
