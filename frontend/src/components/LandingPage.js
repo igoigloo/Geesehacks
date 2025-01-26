@@ -17,7 +17,7 @@ const LandingPage = ({ onGetStarted }) => {
         </div>
         <div className={`video-wrapper ${!showVideos ? 'blurred' : ''}`}>
         <video className="video" autoPlay muted loop>
-            <source src="/output-video.mp4" type="video/mp4" />
+            <source src="/car-getting-hit.mp4" type="video/mp4" />
           </video>
         </div>
       </div>
