@@ -1,15 +1,38 @@
 import MapComponent from "./components/mapComponent";
 import SidebarComponent from "./components/sidebareComponent";
+import LandingPage from "./components/LandingPage";
 import React, { useState, useEffect } from "react";
 
 function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [accidentData, setAccidentData] = useState([]);
-  const [refreshCount, setRefreshCount] = useState(0); // State to trigger re-render
-
+  const [refreshCount, setRefreshCount] = useState(0);
   const [cameras, setCameras] = useState([]);
-
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
+
+  const handleGetStarted = () => {
+    setShowLanding(false);
+    console.log("Landing page hidden"); // Debug log
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/cameras", {});
+        const data = await response.json();
+        setItems(data);
+        setLoaded(true);
+        console.log("Initial data loaded"); // Debug log
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+    
+    if (!showLanding) {
+      loadData();
+    }
+  }, [showLanding]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -119,33 +142,39 @@ function App() {
   };
 
   return (
-    <div style={{ display: "flex" }}>
-      <SidebarComponent data={accidentData} />
-      <MapComponent data={cameras} data2={accidentData} />
-      <button
-        onClick={createAccident}
-        style={{
-          height: "50px",
-          backgroundColor: "black",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          fontSize: "13px",
-          fontWeight: "bold",
-          cursor: "pointer",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-          transition: "background-color 0.3s ease, transform 0.2s ease",
-        }}
-        onMouseOver={(e) => {
-          e.target.style.transform = "scale(1.05)";
-        }}
-        onMouseOut={(e) => {
-          e.target.style.transform = "scale(1)";
-        }}
-      >
-        Create an Accident
-      </button>
-    </div>
+    <>
+      {showLanding ? (
+        <LandingPage onGetStarted={handleGetStarted} />
+      ) : (
+        <div style={{ display: "flex" }}>
+          <SidebarComponent data={accidentData} />
+          <MapComponent data={cameras} data2={accidentData} />
+          <button
+            onClick={createAccident}
+            style={{
+              height: "50px",
+              backgroundColor: "black",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "13px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              transition: "background-color 0.3s ease, transform 0.2s ease",
+            }}
+            onMouseOver={(e) => {
+              e.target.style.transform = "scale(1.05)";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.transform = "scale(1)";
+            }}
+          >
+            Create an Accident
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 
