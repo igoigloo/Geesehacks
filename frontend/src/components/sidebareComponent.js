@@ -1,24 +1,18 @@
 import React from "react";
+import "./SidebarComponent.css";
 
 const SidebarComponent = ({ data }) => {
   return (
-    <div
-      style={{
-        width: "300px",
-        height: "100vh",
-        overflowY: "scroll",
-        backgroundColor: "#f4f4f4",
-        padding: "10px",
-      }}
-    >
+    <div className="sidebar">
       <h2>Accident Logs</h2>
-      <ul>
+      <ul style={{ listStyleType: "none", padding: 0 }}>
         {data.map((accident) => (
-          <li key={accident.id}>
-            <strong>{accident.description}</strong>
+          <li key={accident.id} className="log-item">
+            <strong>{accident.description} ⚠️</strong>
             <p>
-              Location: {accident.lat}, {accident.lng}
+              <strong>Location:</strong> {accident.lat}, {accident.lng}
             </p>
+            <button className="report-button">Report</button>
           </li>
         ))}
       </ul>
