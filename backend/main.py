@@ -1,8 +1,18 @@
 import sqlite3
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
+from twilio.rest import Client
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI()
+
+TWILIO_ACCOUNT_SID = os.getenv("ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+TOW_NUMBER= os.getenv("TOW_NUMBER")
 
 # Enable CORS for the API
 app.add_middleware(
@@ -53,3 +63,48 @@ def read_camera_by_id(camera_id: int):
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
     finally:
         connection.close()
+
+
+app.mount("/images", StaticFiles(directory="data/images"), name="images")
+
+# Endpoint to list image filenames
+@app.get("/image-list")
+def get_image_list():
+    image_folder = "data/images"
+    try:
+        # List all files in the directory
+        images = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
+        return images
+    except FileNotFoundError:
+        return {"error": "Image folder not found."}
+    
+
+@app.post("/make-txt")
+async def text_me(request: Request):
+    data = await request.json()
+    latitude = data.get("lat")
+    longitude = data.get("lng")
+    description = data.get("description")
+
+    
+    print("fire")
+    # Twilio credentials
+    account_sid = TWILIO_ACCOUNT_SID
+    auth_token = TWILIO_AUTH_TOKEN
+    client = Client(account_sid, auth_token)
+
+    body_message = (
+    f"Accident reported at location: {description}\n"
+    f"Latitude: {latitude}\n"
+    f"Longitude: {longitude}"
+)
+    try:
+        # Sending the SMS
+        message = client.messages.create(
+            body=body_message,
+            to=TOW_NUMBER,  # Your phone number
+            from_=TWILIO_PHONE_NUMBER,  # Your Twilio phone number
+        )
+        return {"message": "Message sent successfully!", "sid": message.sid}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
