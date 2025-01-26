@@ -48,25 +48,26 @@ def download_image(image_url, save_path, retries=3, delay=5):
 
 def detect_car_crash(image_path, save_result_path):
     """
-    Detect car crash in an image using YOLO model.
+    Detect car crash in an image based on the presence of any detected objects using YOLO model.
 
     Args:
         image_path (str): Path to the image file.
         save_result_path (str): Path to save the detection results.
     Returns:
-        bool: True if a car crash is detected, False otherwise.
+        bool: True if any object is detected, False otherwise.
     """
     results = model(image_path, save=True, save_txt=True, project=results_folder, name="detections")
     detections = results[0].boxes.data if results else []
 
-    # Check if a car crash label exists
-    car_crash_detected = any(det[5] == "Accident" for det in detections)  # Replace "Accident" with your class name if needed
+    # Detect a crash if any objects are detected
+    car_crash_detected = len(detections) > 0
 
     # Save the result image
     result_img_path = os.path.join(save_result_path, f"result_{os.path.basename(image_path)}")
     if car_crash_detected:
         cv2.imwrite(result_img_path, results[0].plot())
     return car_crash_detected
+
 
 def update_database(camera_id, is_crash):
     """
