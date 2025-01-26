@@ -54,3 +54,6 @@ run data_image_retriever.py to download the images from the camera data and save
 Steps 4:
 run fastAPI-websocket.py to run the fastAPI server and websocket server.
 
+
+IMPORTANT:
+when running dummy-data-gen.py, make sure to delete filtered_camras.db and RERUN accident_data_pipe.py to generate a new database.
