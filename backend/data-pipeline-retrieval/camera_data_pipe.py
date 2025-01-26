@@ -100,7 +100,7 @@ def save_to_database(cameras, db_name=r"backend\data\cameras.db"):
             camera.get('Direction'),
             camera.get('Latitude'), #*
             camera.get('Longitude'), #*
-            camera.get('Location')
+            camera.get('Location') #*
         ))
 
         for view in camera.get('Views', []):

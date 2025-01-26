@@ -38,3 +38,16 @@ graph TD
     classDef database fill:#FF9800,stroke:#F57C00,stroke-width:2px,color:#FFFFFF;
     classDef decision fill:#F44336,stroke:#D32F2F,stroke-width:2px,color:#FFFFFF;
     classDef display fill:#9C27B0,stroke:#6A1B9A,stroke-width:2px,color:#FFFFFF;
+
+Steps 1:
+run camera_data_pipe.py to get the camera data from the Ontario 511 API and save it to the database.
+
+Steps 2:
+run accident_data_pipe.py to get the accident data from the Ontario 511 API and save it to the database.
+
+Steps 3:
+run streamlit-db-viewer.py to view the database in a streamlit app. and view the camera data and filter_cameras data.
+
+Steps 4:
+run fastAPI-websocket.py to run the fastAPI server and websocket server.
+
