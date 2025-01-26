@@ -49,5 +49,8 @@ Steps 3:
 run streamlit-db-viewer.py to view the database in a streamlit app. and view the camera data and filter_cameras data.
 
 Steps 4:
+run data_image_retriever.py to download the images from the camera data and save it to the images folder.
+
+Steps 4:
 run fastAPI-websocket.py to run the fastAPI server and websocket server.
 

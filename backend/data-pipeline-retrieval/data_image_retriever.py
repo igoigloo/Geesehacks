@@ -1,15 +1,23 @@
 import os
 import sqlite3
 import requests
-from time import sleep
+import cv2
+import torch
+from ultralytics import YOLO
+from time import sleep, strftime
 
 # Paths and constants
-db_path = r"backend\data\filtered_cameras.db"  # Update this to your database path
-images_folder = r"C:\Users\igodo\OneDrive\Desktop\Github-repos\Geesehacks\backend\data\images"
+db_path = r"backend\data\filtered_cameras.db"
+images_folder = r"backend\data\images"
+results_folder = r"backend\data\results"
 base_image_url = "https://511on.ca/map/Cctv/"
+model_path = r"backend\best.pt"
 
-# Ensure the images folder exists
-os.makedirs(images_folder, exist_ok=True)
+# Ensure the results folder exists
+os.makedirs(results_folder, exist_ok=True)
+
+# Load the YOLO model
+model = YOLO(model_path)
 
 def download_image(image_url, save_path, retries=3, delay=5):
     """
@@ -38,24 +46,82 @@ def download_image(image_url, save_path, retries=3, delay=5):
             else:
                 print(f"Failed to download image from {image_url} after {retries} attempts.")
 
-# Connect to the database
-connection = sqlite3.connect(db_path)
-cursor = connection.cursor()
+def detect_car_crash(image_path, save_result_path):
+    """
+    Detect car crash in an image using YOLO model.
 
-# Fetch all camera IDs from the Cameras table
-cursor.execute("SELECT Id FROM Cameras")
-camera_ids = cursor.fetchall()  # List of tuples
+    Args:
+        image_path (str): Path to the image file.
+        save_result_path (str): Path to save the detection results.
+    Returns:
+        bool: True if a car crash is detected, False otherwise.
+    """
+    results = model(image_path, save=True, save_txt=True, project=results_folder, name="detections")
+    detections = results[0].boxes.data if results else []
 
-# Loop through each camera ID and download its corresponding image
-for camera_id_tuple in camera_ids:
-    camera_id = camera_id_tuple[0]
-    image_url = f"{base_image_url}{camera_id}"
-    save_path = os.path.join(images_folder, f"camera_{camera_id}.jpg")
-    
-    print(f"Processing camera ID {camera_id}...")
-    download_image(image_url, save_path)
+    # Check if a car crash label exists
+    car_crash_detected = any(det[5] == "Accident" for det in detections)  # Replace "Accident" with your class name if needed
 
-# Close the database connection
-connection.close()
+    # Save the result image
+    result_img_path = os.path.join(save_result_path, f"result_{os.path.basename(image_path)}")
+    if car_crash_detected:
+        cv2.imwrite(result_img_path, results[0].plot())
+    return car_crash_detected
 
-print("Image download process completed.")
+def update_database(camera_id, is_crash):
+    """
+    Update the database with accident status and the last updated time.
+
+    Args:
+        camera_id (int): ID of the camera.
+        is_crash (bool): True if a crash is detected, False otherwise.
+    """
+    accident_status = "TRUE" if is_crash else "FALSE"
+    last_updated_time = strftime("%H:%M")  # Current time in military format (HH:MM)
+
+    cursor.execute("""
+        UPDATE Cameras
+        SET Accident = ?, last_updated = ?
+        WHERE Id = ?
+    """, (accident_status, last_updated_time, camera_id))
+    connection.commit()
+
+# Continuous loop for periodic updates
+while True:
+    print("Starting image processing and crash detection cycle...")
+
+    # Connect to the database
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+
+    # Fetch all camera IDs from the Cameras table
+    cursor.execute("SELECT Id FROM Cameras")
+    camera_ids = cursor.fetchall()  # List of tuples
+
+    # Process each camera
+    for camera_id_tuple in camera_ids:
+        camera_id = camera_id_tuple[0]
+        image_url = f"{base_image_url}{camera_id}"
+        image_save_path = os.path.join(images_folder, f"camera_{camera_id}.jpg")
+        result_save_path = results_folder
+
+        print(f"Processing camera ID {camera_id}...")
+
+        # Download the image
+        download_image(image_url, image_save_path)
+
+        # Detect car crash in the image
+        if os.path.exists(image_save_path):
+            is_crash = detect_car_crash(image_save_path, result_save_path)
+            update_database(camera_id, is_crash)
+            status = "Crash Detected" if is_crash else "No Crash Detected"
+            print(f"Camera ID {camera_id}: {status}")
+        else:
+            print(f"Image for Camera ID {camera_id} could not be processed.")
+
+    # Close the database connection
+    connection.close()
+
+    print("Image processing and crash detection cycle completed.")
+    print("Waiting for 8 minutes before the next cycle...")
+    sleep(480)  # Wait for 8 minutes before the next update

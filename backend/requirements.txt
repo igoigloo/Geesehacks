@@ -2,4 +2,7 @@ pandas
 streamlit
 fastAPI
 uvicorn
+ultralytics
+torch
+opencv-python
 
