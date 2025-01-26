@@ -18,8 +18,6 @@ const Map = () => {
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
-    console.log(process.env.REACT_APP_MAPBOX_TOKEN);
-
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v11",
