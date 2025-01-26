@@ -1,0 +1,16 @@
+import React from "react";
+import LandingPageComponent from "./components/LandingPageComponent";
+
+const App = () => {
+  return (
+    <div className="App">
+      <LandingPageComponent />
+      {/* Other components */}
+    </div>
+  );
+};
+
+export default App;
+
+
+#this is the code for the landing page component to use in the app.js file.
