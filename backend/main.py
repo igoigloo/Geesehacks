@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Path to the SQLite database
-DATABASE_PATH = "/Users/manveersohal/Geesehacks/backend/data/cameras.db"
+DATABASE_PATH = "data/cameras.db"
 
 # Function to connect to the database
 def get_connection():
