@@ -7,11 +7,11 @@ from ultralytics import YOLO
 from time import sleep, strftime
 
 # Paths and constants
-db_path = r"backend\data\filtered_cameras.db"
+db_path = r"C:\Users\igodo\OneDrive\Desktop\Github-repos\Geesehacks\backend\data\filtered_cameras.db"
 images_folder = r"backend\data\images"
 results_folder = r"backend\data\results"
 base_image_url = "https://511on.ca/map/Cctv/"
-model_path = r"backend\best.pt"
+model_path = r"C:\Users\igodo\OneDrive\Desktop\Github-repos\Geesehacks\backend\best.pt"
 
 # Ensure the results folder exists
 os.makedirs(results_folder, exist_ok=True)

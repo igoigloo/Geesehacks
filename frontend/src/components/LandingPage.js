@@ -6,7 +6,7 @@ const LandingPage = ({ onGetStarted }) => {
 
   return (
     <div className="landing-container">
-      <h1 className="title">Traffic Monitor</h1>
+      <h1 className="title">Odin Analytica</h1>
       <p className="subtitle">Monitor real-time traffic and accident data</p>
       
       <div className="videos-container">
