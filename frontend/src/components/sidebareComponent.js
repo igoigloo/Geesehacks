@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "./SidebarComponent.css";
 
 const SidebarComponent = ({ data }) => {
+  const [loadingId, setLoadingId] = useState(null);
+
   const reportAccident = async (accidentDescription) => {
-    const API_KEY = "VF.DM.679610b36d87d3a9603037f2.RTMd2ySsr8EjM2uw"; // Replace with your API key
-    const PROJECT_ID = "6796107770f1b9c43e43aec6"; // Replace with your Voiceflow project ID
-    const ENDPOINT = `https://general-runtime.voiceflow.com/state/${PROJECT_ID}/user`;
+    const API_KEY = process.env.API_KEY;
+    const ENDPOINT = process.env.ENDPOINT;
 
     const payload = {
       action: {
@@ -32,36 +33,55 @@ const SidebarComponent = ({ data }) => {
   };
 
   const text = async (accident) => {
-    const response = await fetch("http://127.0.0.1:8000/make-txt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        lat: accident.lat,
-        lng: accident.lng,
-        description: accident.description,
-      }),
-    });
+    setLoadingId(accident.id);
+    try {
+      const response = await fetch("http://127.0.0.1:8000/make-txt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lat: accident.lat,
+          lng: accident.lng,
+          description: accident.description,
+        }),
+      });
 
-    console.log(response);
+      if (!response.ok) throw new Error("Failed to send report");
+      console.log("Report sent:", response);
+    } catch (error) {
+      console.error("Error sending report:", error);
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   return (
-    <div className="sidebar">
+    <aside className="sidebar">
       <h2>Accident Logs</h2>
-      <ul style={{ listStyleType: "none", padding: 0 }}>
-        {data.map((accident) => (
-          <li key={accident.id} className="log-item">
-            <strong>{accident.description} ⚠️</strong>
-            <p>
-              <strong>Location:</strong> {accident.lat}, {accident.lng}
-            </p>
-            <button className="report-button" onClick={() => text(accident)}>
-              Report
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+      {data.length === 0 ? (
+        <p className="no-logs">No accidents detected 🚦</p>
+      ) : (
+        <ul style={{ listStyleType: "none", padding: 0 }} className="log-list">
+          {data.map((accident) => (
+            <li key={accident.id} className="log-item">
+              <div className="log-header">
+                <strong>{accident.description} ⚠️</strong>
+              </div>
+              <p>
+                <span className="label">Location:</span> {accident.lat},{" "}
+                {accident.lng}
+              </p>
+              <button
+                className="report-button"
+                onClick={() => text(accident)}
+                disabled={loadingId === accident.id}
+              >
+                {loadingId === accident.id ? "Reporting..." : "Report"}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </aside>
   );
 };
 

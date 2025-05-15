@@ -1,6 +1,8 @@
 import MapComponent from "./components/mapComponent";
 import SidebarComponent from "./components/sidebareComponent";
-import LandingPage from "./components/LandingPage";
+// import LandingPage from "./components/LandingPage";
+import TrafficMonitor from "./components/TrafficMonitor";
+
 import React, { useState, useEffect } from "react";
 
 function App() {
@@ -28,7 +30,7 @@ function App() {
         console.error("Error loading data:", error);
       }
     };
-    
+
     if (!showLanding) {
       loadData();
     }
@@ -144,7 +146,7 @@ function App() {
   return (
     <>
       {showLanding ? (
-        <LandingPage onGetStarted={handleGetStarted} />
+        <TrafficMonitor onGetStarted={handleGetStarted} />
       ) : (
         <div style={{ display: "flex" }}>
           <SidebarComponent data={accidentData} />
