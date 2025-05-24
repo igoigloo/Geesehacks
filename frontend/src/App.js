@@ -154,6 +154,10 @@ function App() {
           <button
             onClick={createAccident}
             style={{
+              position: "absolute", // place it inside the parent layout
+              top: "20px",
+              right: "20px", // adjust as needed to float over sidebar or map
+              zIndex: 9999,
               height: "50px",
               backgroundColor: "black",
               color: "white",
