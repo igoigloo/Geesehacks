@@ -62,3 +62,46 @@
 .report-button:active {
   background-color: #b52a30;
 }
+
+/* DARK MODE */
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background-color: #1e1e1e;
+    border-right: 1px solid #333;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+  }
+
+  .sidebar h2 {
+    color: #f0f0f0;
+    border-bottom: 2px solid #333;
+  }
+
+  .log-item {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+  }
+
+  .log-item:hover {
+    background-color: #333;
+  }
+
+  .log-item strong {
+    color: #e0e0e0;
+  }
+
+  .log-item p {
+    color: #aaa;
+  }
+
+  .report-button {
+    background-color: #e04848;
+  }
+
+  .report-button:hover {
+    background-color: #c23a3a;
+  }
+
+  .report-button:active {
+    background-color: #9e2d2d;
+  }
+}
