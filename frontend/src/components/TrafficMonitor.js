@@ -1,4 +1,4 @@
-// TrafficMonitor.js
+// TrafficMonitor.js THE FRONT PAGE
 import React, { useEffect } from "react";
 import "./TrafficMonitor.css";
 
