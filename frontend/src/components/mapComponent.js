@@ -4,6 +4,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 const Map = ({ data, data2 }) => {
   const [images, setImages] = useState([]);
+  const [accidentData, setAccidentData] = useState([]);
+  const [cameras, setCameras] = useState([]);
+  const mapContainerRef = useRef(null);
+  const markersRef = useRef({}); // Store markers by ID for dynamic updates
+
   // Add this to your CSS file or dynamically inject it into your JavaScript
   const styleSheet = document.createElement("style");
   styleSheet.type = "text/css";
@@ -44,23 +49,6 @@ const Map = ({ data, data2 }) => {
     fetchImages();
   }, []);
 
-  const mapContainerRef = useRef(null);
-  const markersRef = useRef({}); // Store markers by ID for dynamic updates
-
-  // Sample accident data
-  // const accidentData = [
-  //   { id: 1, lng: -79.3832, lat: 43.6532, description: "Accident at Main St." },
-  //   {
-  //     id: 2,
-  //     lng: -79.3872,
-  //     lat: 43.6572,
-  //     description: "Collision near Dundas.",
-  //   },
-  // ];
-  const [accidentData, setAccidentData] = useState([]);
-
-  const [cameras, setCameras] = useState([]);
-
   useEffect(() => {
     setAccidentData(data2);
   }, [data2]);
@@ -72,6 +60,7 @@ const Map = ({ data, data2 }) => {
     }
   }, [data]);
 
+  //updates marker, green == no accident, red == accident
   const changeMarkerColor = (newColor) => {
     accidentData.forEach((accident) => {
       const Id = accident.id;
@@ -112,7 +101,7 @@ const Map = ({ data, data2 }) => {
       mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: "mapbox://styles/mapbox/streets-v11",
+        style: "mapbox://styles/mapbox/dark-v11",
         center: [-79.3832, 43.6532],
         zoom: 12,
       });
@@ -191,7 +180,12 @@ src="${
   }, [cameras]);
 
   return (
-    <div ref={mapContainerRef} style={{ width: "100%", height: "100vh" }}></div>
+    <>
+      <div
+        ref={mapContainerRef}
+        style={{ width: "100%", height: "100vh" }}
+      ></div>
+    </>
   );
 };
 
