@@ -2,11 +2,12 @@ import React, { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const Map = ({ data, data2 }) => {
+const Map = ({ data, data2, newClickData }) => {
   const [images, setImages] = useState([]);
   const [accidentData, setAccidentData] = useState([]);
   const [cameras, setCameras] = useState([]);
   const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
   const markersRef = useRef({}); // Store markers by ID for dynamic updates
 
   // Add this to your CSS file or dynamically inject it into your JavaScript
@@ -60,6 +61,16 @@ const Map = ({ data, data2 }) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    console.log(newClickData);
+    if (newClickData.click > 2) {
+      var zoom = 13;
+    } else {
+      var zoom = 8;
+    }
+    zoomToLocation(newClickData.lng, newClickData.lat, zoom);
+  }, [newClickData]);
+
   //updates marker, green == no accident, red == accident
   const changeMarkerColor = (newColor) => {
     accidentData.forEach((accident) => {
@@ -103,13 +114,15 @@ const Map = ({ data, data2 }) => {
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/dark-v11",
         center: [-79.3832, 43.6532],
-        zoom: 12,
+        zoom: 9,
       });
+      mapRef.current = map;
 
       Object.values(markersRef.current).forEach((marker) => marker.remove());
       markersRef.current = {};
 
       cameras.forEach((camera) => {
+        console.log(camera.id, camera.lat, camera.lng);
         var colour = "";
         var width = "22px";
         var height = "22px";
@@ -178,6 +191,19 @@ src="${
       };
     }
   }, [cameras]);
+
+  const zoomToLocation = (longitude, latitude, zoom) => {
+    console.log("THIS IS AN ISSUE, I FLIPPED THE LONG AND LAT");
+    // center: [longitude, latitude], HOW IT WAS PREV
+
+    if (mapRef.current) {
+      mapRef.current.flyTo({
+        center: [longitude, latitude],
+        zoom: zoom, // You can adjust this zoom level
+        essential: true,
+      });
+    }
+  };
 
   return (
     <>

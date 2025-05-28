@@ -12,6 +12,7 @@ function App() {
   const [cameras, setCameras] = useState([]);
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [newClickData, setNewClickData] = useState({});
 
   const handleGetStarted = () => {
     setShowLanding(false);
@@ -100,8 +101,8 @@ function App() {
     if (accidentData.length == 1) {
       const data = {
         id: 818,
-        lat: -79.3371,
-        lng: 42.3273,
+        lng: -79.450137,
+        lat: 43.637321,
         description: "Lake Shore Boulevard near Sunnyside Beach",
         accident: true,
       };
@@ -112,8 +113,8 @@ function App() {
     if (accidentData.length == 2) {
       const data = {
         id: 839,
-        lat: -78.3371,
-        lng: 44.3273,
+        lng: -79.352612,
+        lat: 43.656791,
         description: "Don Valley Parkway near Eastern Avenue",
         accident: true,
       };
@@ -124,8 +125,8 @@ function App() {
     if (accidentData.length == 3) {
       const data = {
         id: 813,
-        lat: -79.3371,
-        lng: 45.3473,
+        lng: -79.418721,
+        lat: 43.630462,
         description: "Lake Shore Boulevard near Ontario Drive",
         accident: true,
       };
@@ -135,12 +136,16 @@ function App() {
 
     const data = {
       id: 832,
-      lat: -79.3471,
-      lng: 43.3273,
+      lng: -79.383321,
+      lat: 43.640341,
       description: "Lake Shore Boulevard near Lower Simcoe Street",
       accident: true,
     };
     setAccidentData((accidentData) => [...accidentData, data]);
+  };
+
+  const onHandleDataClickChange = (newData) => {
+    setNewClickData(newData);
   };
 
   return (
@@ -149,8 +154,15 @@ function App() {
         <TrafficMonitor onGetStarted={handleGetStarted} />
       ) : (
         <div style={{ display: "flex" }}>
-          <SidebarComponent data={accidentData} />
-          <MapComponent data={cameras} data2={accidentData} />
+          <SidebarComponent
+            data={accidentData}
+            onDataClickChange={onHandleDataClickChange}
+          />
+          <MapComponent
+            data={cameras}
+            data2={accidentData}
+            newClickData={newClickData}
+          />
           <button
             onClick={createAccident}
             style={{

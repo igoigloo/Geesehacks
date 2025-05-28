@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "./SidebarComponent.css";
 
-const SidebarComponent = ({ data }) => {
+const SidebarComponent = ({ data, onDataClickChange }) => {
   const [loadingId, setLoadingId] = useState(null);
+  const [clicks, setClicks] = useState(0);
 
   const reportAccident = async (accidentDescription) => {
     const API_KEY = process.env.API_KEY;
@@ -53,7 +54,11 @@ const SidebarComponent = ({ data }) => {
       setLoadingId(null);
     }
   };
-
+  const click = (accident) => {
+    setClicks((clicks) => clicks + 1);
+    accident.click = clicks;
+    onDataClickChange(accident);
+  };
   return (
     <aside className="sidebar">
       <h2>Accident Logs</h2>
@@ -62,7 +67,11 @@ const SidebarComponent = ({ data }) => {
       ) : (
         <ul style={{ listStyleType: "none", padding: 0 }} className="log-list">
           {data.map((accident) => (
-            <li key={accident.id} className="log-item">
+            <li
+              key={accident.id}
+              className="log-item"
+              onClick={() => click(accident)}
+            >
               <div className="log-header">
                 <strong>{accident.description} ⚠️</strong>
               </div>
